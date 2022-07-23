@@ -31,17 +31,14 @@ def effect(fn):
 
 
 def track(target, key):
-    if len(key) >= 2 and key[:2] == '__':
-        return  # 内置变量不要追踪
-
+    if not activeEffect:
+        return
     deps = bucket[id(target)][key]
     deps.add(activeEffect)
     effect2deps[activeEffect].append(deps)
 
 
 def trigger(target, key):
-    if len(key) >= 2 and key[:2] == '__':
-        return
     effects = bucket[id(target)][key]
     effectsToRun = {effect for effect in effects if effect != activeEffect}
     for effect in effectsToRun:
@@ -54,18 +51,43 @@ def cleanup(effectFn):
     del effect2deps[effectFn]
 
 
+def ref(raw=0):
+    @dataclass
+    class R:
+        value: object
+
+    return Proxy(R(raw))
+
+
+def reactive(raw):
+    return Proxy(raw)
+
+
+def computed(getter):
+    result = ref()
+    def fn(): result.value = getter()
+    effect(fn)
+    return result
+
+
 if __name__ == '__main__':
     @dataclass
     class Person:
         name: str
         age: int
 
-
-    data = Person('wei', 21)
-    obj = Proxy(data)
+    obj = Proxy(Person('wei', 21))
     effect(lambda: (print(obj.name) if obj.age else None))
     obj.age = 0
     obj.age = 1
     obj.age = 0
     obj.age = 0
     obj.age = 0
+
+    v = ref(0)
+    effect(lambda: (print(v.value)))
+    v.value += 1
+
+    a = computed(lambda: v.value + 1)
+    v.value += 1
+    print(a.value)
