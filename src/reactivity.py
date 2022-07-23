@@ -85,9 +85,11 @@ if __name__ == '__main__':
     obj.age = 0
 
     v = ref(0)
-    effect(lambda: (print(v.value)))
+    # effect(lambda: (print(v.value)))
     v.value += 1
-
-    a = computed(lambda: v.value + 1)
+    ok = ref(0)
+    a = computed(lambda: v.value + 1 if ok.value else 999)
     v.value += 1
+    v.value += 1
+    ok.value = 1
     print(a.value)
