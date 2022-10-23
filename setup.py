@@ -8,11 +8,11 @@ README = (HERE / "README.md").read_text(encoding='utf-8')
 
 setup(
     name='reactivity',
-    version='0.0.1',
+    version='0.0.2',
     py_modules=['reactivity'],
     description='a python vesion vue/reactivity api',
-    long_description=README,
     url='https://gitee.com/Xu-pixel/vue-reactivity-python',
+    long_description=README,
     long_description_content_type="text/markdown",
     package_dir={'': 'src'},
     install_requires=[]
